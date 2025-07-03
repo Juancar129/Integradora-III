@@ -23,9 +23,20 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  category    Category
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
 
-
-
-// parte de la creacion de la baase de datos de los dispositivos 
+enum Category {
+  LAPTOP
+  CELULAR
+  HARDWARE
+}
 
 
