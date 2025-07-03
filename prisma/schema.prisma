@@ -14,14 +14,18 @@ datasource db {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  name     String
-  email    String  @unique
-  password String
-  active   Boolean @default(true)
-
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  active    Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt DateTime?
-
-
+  updatedAt DateTime @updatedAt
 }
+
+
+
+
+// parte de la creacion de la baase de datos de los dispositivos 
+
+
