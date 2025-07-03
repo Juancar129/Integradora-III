@@ -1,3 +1,3 @@
 export const jwtConstants = {
-  secret: 'jwt_secret_key',
+  secret: 'mi_clave_secreta_segura', // Puedes poner algo más seguro en producción
 };
