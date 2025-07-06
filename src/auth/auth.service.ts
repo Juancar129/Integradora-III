@@ -12,8 +12,6 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  
-
   async register(dto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
@@ -26,7 +24,11 @@ export class AuthService {
       },
     });
 
-    const token = this.jwtService.sign({ email: user.email, sub: user.id });
+    const token = this.jwtService.sign({ 
+      email: user.email, 
+      sub: user.id,
+      role: user.role,  // Añadido para consistencia (opcional)
+    });
 
     return {
       access_token: token,
@@ -43,31 +45,30 @@ export class AuthService {
     const valid = await bcrypt.compare(dto.password, user.password);
     if (!valid) throw new UnauthorizedException('Credenciales incorrectas');
 
-    const token = this.jwtService.sign({ email: user.email, sub: user.id });
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      role: user.role,  // Campo agregado al payload
+    };
+
+    const token = this.jwtService.sign(payload);
 
     return {
       access_token: token,
     };
   }
 
-
   async validateUser(email: string, password: string): Promise<any> {
-  const user = await this.prisma.user.findUnique({
-    where: {email},
-  });
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
 
-  if (!user) return null;
+    if (!user) return null;
 
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) return null;
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) return null;
 
-  const { password: _password, ...result } = user;
-  return result;
+    const { password: _password, ...result } = user;
+    return result;
+  }
 }
-
-
-
-
-
-}
-

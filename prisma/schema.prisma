@@ -54,5 +54,3 @@ model Order {
   total     Float
   createdAt DateTime  @default(now())
 }
-
-
