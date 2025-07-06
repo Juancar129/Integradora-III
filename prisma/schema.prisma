@@ -54,20 +54,3 @@ model Order {
   total     Float
   createdAt DateTime  @default(now())
 }
-
-model Product {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String?
-  price       Float
-  category    Category
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-enum Category {
-  LAPTOP
-  CELULAR
-  HARDWARE
-}
-
