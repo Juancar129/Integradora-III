@@ -4,10 +4,6 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 2db670587bfd71c50c7836dc8afdeeee8aa0aade
 generator client {
   provider = "prisma-client-js"
 }
@@ -40,6 +36,7 @@ model Product {
   updatedAt   DateTime @updatedAt
 
   carItems CartItem []
+  orderItems  OrderItem[] //nuevos cambios
 }
 
 model Cart {
@@ -60,10 +57,26 @@ model CartItem {
   product   Product  @relation(fields: [productId], references: [id])
 }
 
-model Order {
-  id        Int       @id @default(autoincrement())
-  userId    Int
-  user      User      @relation(fields: [userId], references: [id])
-  total     Float
-  createdAt DateTime  @default(now())
+//se actualiza el modelo de order para incluir orderItems
+ model Order {
+  id         Int         @id @default(autoincrement())
+  userId     Int
+  user       User        @relation(fields: [userId], references: [id])
+  total      Float
+  createdAt  DateTime    @default(now())
+  orderItems OrderItem[]
 }
+
+//se implementa el modelo de orderItems
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  price     Float
+
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+
