@@ -12,3 +12,6 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     await this.$disconnect(); 
   }
 }
+
+//controlador de ejemplo
+//modulo de servicios   
