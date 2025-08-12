@@ -5,6 +5,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProductsModule } from './products/products.module';
 import { OrdersModule } from './orders/orders.module';
+import { ProjectsModule } from './Projects/projects.module';
+import { CartModule } from './cart/cart.module';
 
 
 @Module({
@@ -12,9 +14,11 @@ import { OrdersModule } from './orders/orders.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ProjectsModule,
     AuthModule,
     ProductsModule, 
-    OrdersModule //se agrega el modulo de orders
+    OrdersModule,
+    CartModule
   ],
   controllers: [AppController],
   providers: [AppService],

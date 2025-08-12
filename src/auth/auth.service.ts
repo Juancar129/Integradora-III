@@ -27,7 +27,7 @@ export class AuthService {
     const token = this.jwtService.sign({ 
       email: user.email, 
       sub: user.id,
-      role: user.role,  // Añadido para consistencia (opcional)
+      role: user.role,  
     });
 
     return {
