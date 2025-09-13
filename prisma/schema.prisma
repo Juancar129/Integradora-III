@@ -60,14 +60,19 @@ model CartItem {
 }
 
 //se actualiza el modelo de order para incluir orderItems
- model Order {
-  id         Int         @id @default(autoincrement())
+model Order {
+  id         Int          @id @default(autoincrement())
   userId     Int
-  user       User        @relation(fields: [userId], references: [id])
   total      Float
-  createdAt  DateTime    @default(now())
+  status     String       @default("PENDING")
+  paypalId   String?      @unique
+  createdAt  DateTime     @default(now())
+
+  user       User         @relation(fields: [userId], references: [id])
   orderItems OrderItem[]
 }
+
+
 
 //se implementa el modelo de orderItems
 model OrderItem {
@@ -81,8 +86,3 @@ model OrderItem {
   product   Product @relation(fields: [productId], references: [id])
 }
 
-model Project {
-  id          Int    @id @default(autoincrement())
-  name        String
-  description String
-}

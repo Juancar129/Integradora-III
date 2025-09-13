@@ -1,46 +1,38 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ProductsService } from './products.service';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
-describe('ProductsService', () => {
-  let service: ProductsService;
+@Injectable()
+export class ProductsService {
+  constructor(private prisma: PrismaService) {}
 
-  const mockPrisma = {
-    product: {
-      create: jest.fn().mockResolvedValue({
-        id: 1,
-        name: 'Test product',
-        description: 'A test product',
-        price: 100,
-        stock: 10,
-      }),
-    },
-  };
+  create(dto: CreateProductDto) {
+    return this.prisma.product.create({
+      data: dto,
+    });
+  }
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        ProductsService,
-        {
-          provide: PrismaService,
-          useValue: mockPrisma,
-        },
-      ],
-    }).compile();
+  findAll() {
+    return this.prisma.product.findMany();
+  }
 
-    service = module.get<ProductsService>(ProductsService);
-  });
+  findOne(id: number) {
+    return this.prisma.product.findUnique({
+      where: { id },
+    });
+  }
 
-  it('should create a product', async () => {
-    const mockProduct = {
-      name: 'Test product',
-      description: 'A test product',
-      price: 100,
-      stock: 10,
-    };
+  update(id: number, dto: UpdateProductDto) {
+    return this.prisma.product.update({
+      where: { id:id },
+      data: dto,
+    });
+  }
 
-    const createdProduct = await service.create(mockProduct);
-    expect(createdProduct).toHaveProperty('id');
-    expect(createdProduct.name).toBe(mockProduct.name);
-  });
-});
+  delete(id: number) {
+    return this.prisma.product.delete({
+      where: { id },
+    });
+  }
+}

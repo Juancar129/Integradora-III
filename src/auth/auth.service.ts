@@ -12,6 +12,11 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+  /**
+   * Registra un nuevo usuario en la base de datos.
+   * @param {CreateUserDto} dto - Datos del usuario a registrar.
+   * @returns {Promise<{ access_token: string }>} Token JWT del usuario registrado.
+   */
   async register(dto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
@@ -35,6 +40,12 @@ export class AuthService {
     };
   }
 
+  /**
+   * Inicia sesión validando credenciales de un usuario.
+   * @param {LoginUserDto} dto - Credenciales de acceso del usuario.
+   * @throws {UnauthorizedException} Si el usuario no existe o la contraseña no coincide.
+   * @returns {Promise<{ access_token: string }>} Token JWT del usuario autenticado.
+   */
   async login(dto: LoginUserDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
@@ -58,6 +69,12 @@ export class AuthService {
     };
   }
 
+  /**
+   * Valida un usuario por su email y contraseña.
+   * @param {string} email - Correo electrónico del usuario.
+   * @param {string} password - Contraseña del usuario.
+   * @returns {Promise<object|null>} El usuario sin la contraseña si es válido, o null en caso contrario.
+   */
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.prisma.user.findUnique({
       where: { email },

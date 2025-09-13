@@ -6,6 +6,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 export class OrdersService {
   constructor(private prisma: PrismaService) {}
 
+  // Orden normal
   async create(userId: number, dto: CreateOrderDto) {
     return this.prisma.order.create({
       data: {
@@ -23,6 +24,18 @@ export class OrdersService {
     });
   }
 
+  // Orden vía PayPal
+  async createFromPaypal(userId: number, paypalId: string, amount: number, status: string) {
+    return this.prisma.order.create({
+      data: {
+        userId,
+        total: amount,
+        status,
+        paypalId,
+      },
+    });
+  }
+
   async findByUser(userId: number) {
     return this.prisma.order.findMany({
       where: { userId },
@@ -31,3 +44,4 @@ export class OrdersService {
     });
   }
 }
+

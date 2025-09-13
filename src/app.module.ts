@@ -5,8 +5,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProductsModule } from './products/products.module';
 import { OrdersModule } from './orders/orders.module';
-import { ProjectsModule } from './Projects/projects.module';
 import { CartModule } from './cart/cart.module';
+import { PaypalModule } from './Paypal/paypal.module';
 
 
 @Module({
@@ -14,11 +14,11 @@ import { CartModule } from './cart/cart.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    ProjectsModule,
     AuthModule,
     ProductsModule, 
     OrdersModule,
-    CartModule
+    CartModule,
+    PaypalModule,
   ],
   controllers: [AppController],
   providers: [AppService],
