@@ -7,7 +7,7 @@ import { ProductsModule } from './products/products.module';
 import { OrdersModule } from './orders/orders.module';
 import { CartModule } from './cart/cart.module';
 import { PaypalModule } from './Paypal/paypal.module';
-
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -15,6 +15,7 @@ import { PaypalModule } from './Paypal/paypal.module';
       isGlobal: true,
     }),
     AuthModule,
+    UsersModule,
     ProductsModule, 
     OrdersModule,
     CartModule,
