@@ -4,7 +4,8 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login.dto';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'; 
+import { PrismaClient, Prisma } from '@prisma/client' 
+
 
 @Injectable()
 export class AuthService {
@@ -47,17 +48,16 @@ export class AuthService {
           access_token: token,
         };
 
-    } catch (error) {
-        // 3. MANEJO DE ERROR P2002 (Email Duplicado)
-        if (error instanceof PrismaClientKnownRequestError) {
-            if (error.code === 'P2002') {
-                // Lanza un 409 Conflict para el frontend
-                throw new ConflictException('El correo electrónico ya está registrado.'); 
-            }
-        }
-        // Lanza cualquier otro error como un error interno 500
-        throw error;
+} catch (error) {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error.code === 'P2002') {
+      throw new ConflictException('El correo electrónico ya está registrado.');
     }
+  }
+
+  throw error;
+}
+
   }
 
   /**

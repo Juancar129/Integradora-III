@@ -6,6 +6,7 @@
 
 datasource db {
   provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -58,14 +59,18 @@ model CartItem {
 }
 
 //se actualiza el modelo de order para incluir orderItems
- model Order {
+model Order {
   id         Int         @id @default(autoincrement())
   userId     Int
   user       User        @relation(fields: [userId], references: [id])
+  paypalId   String?
   total      Float
   createdAt  DateTime    @default(now())
+  status     String      @default("PENDING") 
   orderItems OrderItem[]
 }
+
+
 
 //se implementa el modelo de orderItems
 model OrderItem {
