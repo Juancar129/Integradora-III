@@ -30,7 +30,6 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.1",
     "@paypal/checkout-server-sdk": "^1.0.3",
-    "@prisma/adapter-pg": "^7.0.1",
     "@prisma/client": "^6.0.0",
     "axios": "^1.12.2",
     "bcrypt": "^6.0.0",

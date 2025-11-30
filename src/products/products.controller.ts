@@ -42,7 +42,8 @@ export class ProductsController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  delete(@Param('id') id: string) {
-    return this.productsService.delete(+id);
-  }
+  @Delete(':id')
+remove(@Param('id') id: string) {
+  return this.productsService.remove(+id); 
+}
 }

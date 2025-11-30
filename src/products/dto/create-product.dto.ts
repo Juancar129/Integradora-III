@@ -1,27 +1,33 @@
-import { IsString, IsNotEmpty, IsNumber, Min } from 'class-validator';
-import { Type } from 'class-transformer'; // <-- Import necesario
-import { ApiProperty } from '@nestjs/swagger';
+import { 
+    IsString, 
+    IsNumber, 
+    Min, 
+    IsArray, 
+    ArrayMinSize,
+} from 'class-validator';
 
 export class CreateProductDto {
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ required: true, description: 'Nombre del producto' })
-  name: string;
+    
+    @IsString()
+    name: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ required: true, description: 'Descripción del producto' })
-  description: string;
+    @IsNumber({ maxDecimalPlaces: 2 })
+    @Min(0.01)
+    price: number;
 
-  @IsNumber()
-  @Type(() => Number)         
-  @Min(0)
-  @ApiProperty({ required: true, description: 'Precio del producto' })
-  price: number;
+    @IsString()
+    description: string;
 
-  @IsNumber()
-  @Type(() => Number)         
-  @Min(0)
-  @ApiProperty({ required: true, description: 'Cantidad en stock del producto' })
-  stock: number;
+    @IsNumber()
+    @Min(0)
+    stock: number;
+    
+    @IsString()
+    category: string; 
+
+  4
+    @IsArray()
+    @IsString({ each: true }) // Asegura que cada elemento es una URL string
+    @ArrayMinSize(4) // Valida que haya un mínimo de 4 imágenes
+    images: string[]; 
 }
