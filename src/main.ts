@@ -1,18 +1,24 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
 
-  // Habilitar CORS para permitir peticiones desde tu frontend
+  const app = await NestFactory.create(AppModule, { cors: true });
+
+
+  app.setGlobalPrefix('api'); 
+
+ 
   app.enableCors({
-    origin: 'http://localhost:5173',
+    origin: 'http://localhost:5173', 
+    methods: 'GET,POST,PUT,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
   });
 
-  // Validaciones globales
+  
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -22,18 +28,8 @@ async function bootstrap() {
     }),
   );
 
-  // Swagger
-  const config = new DocumentBuilder()
-    .setTitle('API de Ejemplo')
-    .setDescription('Backend del proyecto de ejemplo')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
+ 
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-
-  // Iniciar servidor
-  await app.listen(process.env.PORT ?? 3007);
+  await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

@@ -1,23 +1,14 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { validateOrReject } from 'class-validator';
 
 @Injectable()
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(dto: CreateProductDto) {
-    try {
-      // Forzar validación de DTO
-      await validateOrReject(dto);
-    } catch (errors) {
-      // Si hay errores, lanzamos BadRequest
-      throw new BadRequestException(errors);
-    }
-
-    return this.prisma.product.create({ data: dto });
+  create(data: CreateProductDto) {
+    return this.prisma.product.create({ data });
   }
 
   findAll() {
@@ -25,14 +16,36 @@ export class ProductsService {
   }
 
   findOne(id: number) {
-    return this.prisma.product.findUnique({ where: { id } });
+    return this.prisma.product.findUnique({
+      where: { id },
+    });
   }
 
-  update(id: number, dto: UpdateProductDto) {
-    return this.prisma.product.update({ where: { id }, data: dto });
+  update(id: number, data: UpdateProductDto) {
+    return this.prisma.product.update({
+      where: { id },
+      data,
+    });
   }
 
-  delete(id: number) {
+  remove(id: number) {
     return this.prisma.product.delete({ where: { id } });
+  }
+
+  // ✅ Productos similares usando "categoria"
+  async getSimilarProducts(productId: number) {
+    const product = await this.prisma.product.findUnique({
+      where: { id: productId },
+    });
+
+    if (!product || !product.categoria) return [];
+
+    return this.prisma.product.findMany({
+      where: {
+        categoria: product.categoria,
+        NOT: { id: productId },
+      },
+      take: 4,
+    });
   }
 }
