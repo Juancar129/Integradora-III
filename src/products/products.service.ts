@@ -7,20 +7,24 @@ import { UpdateProductDto } from './dto/update-product.dto';
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
+  // Crear producto
   create(data: CreateProductDto) {
     return this.prisma.product.create({ data });
   }
 
-  findAll() {
+  // Obtener todos los productos
+  async findAll() {
     return this.prisma.product.findMany();
   }
 
+  // Obtener producto por ID
   findOne(id: number) {
     return this.prisma.product.findUnique({
       where: { id },
     });
   }
 
+  // Actualizar producto
   update(id: number, data: UpdateProductDto) {
     return this.prisma.product.update({
       where: { id },
@@ -28,11 +32,12 @@ export class ProductsService {
     });
   }
 
+  // Eliminar producto
   remove(id: number) {
     return this.prisma.product.delete({ where: { id } });
   }
 
-  // ✅ Productos similares usando "categoria"
+  // 🔥 Productos similares por categoría
   async getSimilarProducts(productId: number) {
     const product = await this.prisma.product.findUnique({
       where: { id: productId },
@@ -45,7 +50,7 @@ export class ProductsService {
         categoria: product.categoria,
         NOT: { id: productId },
       },
-      take: 4,
+      take: 4, // solo 4 productos similares
     });
   }
 }
