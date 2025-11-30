@@ -32,7 +32,6 @@ export class ProductsController {
     return this.productsService.remove(Number(id));
   }
 
-  // 🔥 Nueva ruta: similares
   @Get(':id/similar')
   getSimilar(@Param('id') id: string) {
     return this.productsService.getSimilarProducts(Number(id));
