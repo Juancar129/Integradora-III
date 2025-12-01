@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -7,50 +7,78 @@ import { UpdateProductDto } from './dto/update-product.dto';
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
-  // Crear producto
-  create(data: CreateProductDto) {
-    return this.prisma.product.create({ data });
-  }
+ 
+  async create(data: CreateProductDto) {
+    const { images, ...rest } = data;
 
-  // Obtener todos los productos
-  async findAll() {
-    return this.prisma.product.findMany();
-  }
-
-  // Obtener producto por ID
-  findOne(id: number) {
-    return this.prisma.product.findUnique({
-      where: { id },
+    return this.prisma.product.create({
+      data: {
+        ...rest,
+        images: {
+          create: images.map(url => ({ url })),
+        },
+      },
+      include: { images: true },
     });
   }
 
-  // Actualizar producto
-  update(id: number, data: UpdateProductDto) {
+  findAll() {
+    return this.prisma.product.findMany({
+      include: { images: true },
+    });
+  }
+
+  async findOne(id: number) {
+    const product = await this.prisma.product.findUnique({
+      where: { id },
+      include: { images: true },
+    });
+
+    if (!product) throw new NotFoundException('Producto no encontrado');
+    return product;
+  }
+
+
+  async update(id: number, data: UpdateProductDto) {
+    await this.findOne(id);
+
+    const { images, ...rest } = data;
+
     return this.prisma.product.update({
       where: { id },
-      data,
+      data: {
+        ...rest,
+        // Solo actualiza imágenes si vienen en el DTO
+        ...(images && {
+          images: {
+            deleteMany: {}, // Borra las imágenes anteriores
+            create: images.map(url => ({ url })), // Inserta las nuevas
+          },
+        }),
+      },
+      include: { images: true },
     });
   }
 
-  // Eliminar producto
-  remove(id: number) {
-    return this.prisma.product.delete({ where: { id } });
+  async remove(id: number) {
+    await this.findOne(id);
+    return this.prisma.product.delete({
+      where: { id },
+    });
   }
 
-  // 🔥 Productos similares por categoría
   async getSimilarProducts(productId: number) {
-    const product = await this.prisma.product.findUnique({
-      where: { id: productId },
-    });
+    const product = await this.findOne(productId);
 
-    if (!product || !product.categoria) return [];
+    if (!product.categoria) return [];
 
     return this.prisma.product.findMany({
       where: {
         categoria: product.categoria,
         NOT: { id: productId },
       },
-      take: 4, // solo 4 productos similares
+      take: 4,
+      include: { images: true },
     });
   }
 }
