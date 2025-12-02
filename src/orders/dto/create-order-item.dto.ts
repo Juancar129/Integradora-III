@@ -1,4 +1,4 @@
-import { IsInt, IsPositive } from 'class-validator';
+import { IsInt, IsPositive, IsNumber } from 'class-validator';
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateOrderItemDto {
@@ -11,7 +11,7 @@ export class CreateOrderItemDto {
   @ApiProperty({ required: true, description: 'Cantidad del producto' })
   quantity: number;
 
-  @IsInt()
+  @IsNumber() // Usamos IsNumber si el precio puede tener decimales.
   @IsPositive()
   @ApiProperty({ required: true, description: 'Precio del producto' })
   price: number;

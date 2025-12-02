@@ -6,12 +6,22 @@ import { CreateOrderDto } from './dto/create-order.dto';
 export class OrdersService {
   constructor(private prisma: PrismaService) {}
 
-  // Orden normal
+  /**
+   * Crea una orden normal (pago sin PayPal).
+   * Se corrigen los errores de TypeScript al incluir los campos de envío requeridos.
+   */
   async create(userId: number, dto: CreateOrderDto) {
     return this.prisma.order.create({
       data: {
         userId,
         total: dto.total,
+        // 💡 CORRECCIÓN TS: Campos de envío requeridos por el modelo Order
+        recipientName: dto.recipientName,
+        streetAddress: dto.streetAddress,
+        city: dto.city,
+        postalCode: dto.postalCode,
+        country: dto.country,
+        // Fin de corrección
         orderItems: {
           create: dto.items.map(item => ({
             productId: item.productId,
@@ -24,15 +34,37 @@ export class OrdersService {
     });
   }
 
-  // Orden vía PayPal
-  async createFromPaypal(userId: number, paypalId: string, amount: number, status: string) {
+  /**
+   * Crea una orden después de la captura de PayPal.
+   * Se corrigen los parámetros para aceptar los 5 campos de envío extraídos de PayPal.
+   */
+  async createFromPaypal(
+    userId: number, 
+    paypalId: string, 
+    amount: number, 
+    status: string,
+    // 💡 Nuevos parámetros de envío
+    recipientName: string,
+    streetAddress: string,
+    city: string,
+    postalCode: string,
+    country: string,
+  ) {
     return this.prisma.order.create({
       data: {
         userId,
         total: amount,
         status,
         paypalId,
+        // Asignar los datos de envío
+        recipientName, 
+        streetAddress,
+        city,
+        postalCode,
+        country,
       },
+      // ⚠️ NOTA: Esta función aún no guarda los 'orderItems', solo el total y el estado.
+      // Recuerda que el flujo de PayPal requiere guardar los items en el create-order.
     });
   }
 
@@ -44,4 +76,3 @@ export class OrdersService {
     });
   }
 }
-

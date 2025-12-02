@@ -1,32 +1,30 @@
 import { 
-  IsString, 
-  IsNumber, 
-  Min, 
-  IsArray, 
-  ArrayMinSize,
+    IsString, 
+    IsNumber, 
+    Min, 
 } from 'class-validator';
 
 export class CreateProductDto {
 
-  @IsString()
-  name: string;
+    @IsString()
+    name: string;
 
-  @IsNumber({ maxDecimalPlaces: 2 })
-  @Min(0.01)
-  price: number;
+    @IsNumber({ maxDecimalPlaces: 2 })
+    @Min(0.01)
+    price: number;
 
-  @IsString()
-  description: string;
+    @IsString()
+    description: string;
 
-  @IsNumber()
-  @Min(0)
-  stock: number;
+    @IsNumber()
+    @Min(0)
+    stock: number;
 
-  @IsString()
-  category: string;
+    // 1. Campo para la lógica de negocio y filtro (ya existía)
+    @IsString()
+    category: string; 
 
-  @IsArray()
-  @IsString({ each: true }) // Cada valor debe ser string
-  @ArrayMinSize(4)          // Mínimo 4 imágenes
-  images: string[];
+    
+    @IsString()
+    categoria: string; 
 }

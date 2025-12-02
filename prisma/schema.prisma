@@ -27,20 +27,26 @@ model User {
   orders    Order[]
 }
 
+// En tu archivo prisma/schema.prisma
+
 model Product {
   id          Int      @id @default(autoincrement())
   name        String
-  description String
+  // 🛑 CORRECCIÓN: El campo 'description' debería ser @db.Text para descripciones largas
+  description String   @db.Text 
   price       Float
   stock       Int
-  imagen      String?     
+  
+  // 🛑 RECOMENDACIÓN: Elimina 'imagen String?' si usas el array 'images'
+  // imagen String? 
+
   categoria   String? 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   category    String   
- carItems  CartItem []
- orderItems OrderItem[] 
-  images     ProductImage[] 
+  carItems    CartItem[]
+  orderItems  OrderItem[] 
+  images      ProductImage[] 
 }
 
 model ProductImage {
@@ -69,16 +75,27 @@ model CartItem {
 
 //se actualiza el modelo de order para incluir orderItems
 model Order {
-  id         Int         @id @default(autoincrement())
-  userId     Int
-  user       User        @relation(fields: [userId], references: [id])
-  paypalId   String?
-  total      Float
-  createdAt  DateTime    @default(now())
-  status     String      @default("PENDING") 
-  orderItems OrderItem[]
+  id              Int           @id @default(autoincrement())
+  userId          Int
+  user            User          @relation(fields: [userId], references: [id])
+  paypalId        String?
+  total           Float
+  createdAt       DateTime      @default(now())
+  status          String        @default("PENDING") 
+  orderItems      OrderItem[]
+  // Información de envío
+  
+  // Nombre del destinatario
+  recipientName   String
+  // Calle y número
+  streetAddress   String
+  // Ciudad
+  city            String
+  // Código postal
+  postalCode      String
+  // País o región
+  country         String
 }
-
 
 
 //se implementa el modelo de orderItems

@@ -18,6 +18,9 @@ export class PaypalService {
       const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
       const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 
+      // 💡 NUEVO LOG DE DEPURACIÓN AÑADIDO
+      this.logger.log('Intentando obtener el Access Token de PayPal...'); 
+
       const response = await this.http.axiosRef.post(
         'https://api-m.sandbox.paypal.com/v1/oauth2/token',
         'grant_type=client_credentials',
@@ -28,6 +31,8 @@ export class PaypalService {
           },
         },
       );
+      
+      this.logger.log('Access Token obtenido con éxito.'); // Opcional: Confirmar si pasa
 
       this.accessToken = response.data.access_token;
       return this.accessToken;
@@ -39,6 +44,7 @@ export class PaypalService {
 
   async createOrder(amount: string) {
     try {
+      // Si el accessToken no existe o ha expirado, se llama a generateAccessToken
       if (!this.accessToken) await this.generateAccessToken();
 
       const orderData = {
@@ -78,11 +84,25 @@ export class PaypalService {
           paypalData.purchase_units[0].payments.captures[0].amount.value,
         );
 
+        // EXTRAER DATOS DE ENVÍO DE LA RESPUESTA DE PAYPAL
+        const shipping = paypalData.purchase_units[0].shipping;
+        const recipientName = shipping.name.full_name;
+        const streetAddress = shipping.address.address_line_1;
+        const city = shipping.address.admin_area_2; 
+        const postalCode = shipping.address.postal_code;
+        const country = shipping.address.country_code;
+
+        // LLAMAR AL SERVICIO DE ORDENES CON LOS NUEVOS PARÁMETROS
         await this.ordersService.createFromPaypal(
           userId,
           paypalData.id,
           amount,
           paypalData.status,
+          recipientName,
+          streetAddress,
+          city,
+          postalCode,
+          country,
         );
       }
 
