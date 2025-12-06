@@ -18,7 +18,6 @@ export class PaypalService {
       const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
       const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 
-      // 💡 NUEVO LOG DE DEPURACIÓN AÑADIDO
       this.logger.log('Intentando obtener el Access Token de PayPal...'); 
 
       const response = await this.http.axiosRef.post(
@@ -32,37 +31,70 @@ export class PaypalService {
         },
       );
       
-      this.logger.log('Access Token obtenido con éxito.'); // Opcional: Confirmar si pasa
-
       this.accessToken = response.data.access_token;
+
+      this.logger.log('Access Token obtenido con éxito.');
       return this.accessToken;
     } catch (error: any) {
-      this.logger.error('Error generando access token PayPal', error.response?.data || error.message);
+      this.logger.error(
+        'Error generando access token PayPal',
+        error.response?.data || error.message,
+      );
       throw new HttpException('Error generando access token PayPal', 500);
     }
   }
 
   async createOrder(amount: string) {
     try {
-      // Si el accessToken no existe o ha expirado, se llama a generateAccessToken
       if (!this.accessToken) await this.generateAccessToken();
 
+      // 🔥🔥🔥 PARTE CLAVE: Sin esto NO SE GENERAN LINKS EN PAYPAL 🔥🔥🔥
       const orderData = {
         intent: 'CAPTURE',
         purchase_units: [
-          { amount: { currency_code: 'USD', value: amount } },
+          {
+            amount: {
+              currency_code: 'USD',
+              value: amount,
+            },
+          },
         ],
+        application_context: {
+          brand_name: "Tu Tienda",
+          landing_page: "LOGIN",
+          user_action: "PAY_NOW",
+          return_url: "http://localhost:5173/paypal/success",
+          cancel_url: "http://localhost:5173/paypal/cancel"
+        }
       };
+
+      this.logger.log('Enviando orden a PayPal...');
+      this.logger.debug(JSON.stringify(orderData, null, 2));
 
       const response = await this.http.axiosRef.post(
         'https://api-m.sandbox.paypal.com/v2/checkout/orders',
         orderData,
-        { headers: { Authorization: `Bearer ${this.accessToken}` } },
+        {
+          headers: {
+            Authorization: `Bearer ${this.accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      // LOG RAW DE PAYPAL (lo deja clarito)
+      this.logger.warn(
+        'RESPUESTA COMPLETA DE PAYPAL:\n' +
+        JSON.stringify(response.data, null, 2)
       );
 
       return response.data;
+
     } catch (error: any) {
-      this.logger.error('Error creando orden PayPal', error.response?.data || error.message);
+      this.logger.error(
+        'Error creando orden PayPal',
+        error.response?.data || error.message,
+      );
       throw new HttpException('Error creando orden PayPal', 500);
     }
   }
@@ -84,15 +116,13 @@ export class PaypalService {
           paypalData.purchase_units[0].payments.captures[0].amount.value,
         );
 
-        // EXTRAER DATOS DE ENVÍO DE LA RESPUESTA DE PAYPAL
         const shipping = paypalData.purchase_units[0].shipping;
-        const recipientName = shipping.name.full_name;
-        const streetAddress = shipping.address.address_line_1;
-        const city = shipping.address.admin_area_2; 
-        const postalCode = shipping.address.postal_code;
-        const country = shipping.address.country_code;
+        const recipientName = shipping?.name?.full_name || null;
+        const streetAddress = shipping?.address?.address_line_1 || null;
+        const city = shipping?.address?.admin_area_2 || null;
+        const postalCode = shipping?.address?.postal_code || null;
+        const country = shipping?.address?.country_code || null;
 
-        // LLAMAR AL SERVICIO DE ORDENES CON LOS NUEVOS PARÁMETROS
         await this.ordersService.createFromPaypal(
           userId,
           paypalData.id,
@@ -108,7 +138,10 @@ export class PaypalService {
 
       return paypalData;
     } catch (error: any) {
-      this.logger.error('Error capturando orden PayPal', error.response?.data || error.message);
+      this.logger.error(
+        'Error capturando orden PayPal',
+        error.response?.data || error.message,
+      );
       throw new HttpException('Error capturando orden PayPal', 500);
     }
   }
