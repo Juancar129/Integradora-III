@@ -5,16 +5,23 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProductsModule } from './products/products.module';
 import { OrdersModule } from './orders/orders.module';
-
+import { CartModule } from './cart/cart.module';
+import { PaypalModule } from './Paypal/paypal.module';
+import { UsersModule } from './users/users.module';
+import { PrismaModule } from './prisma/prisma.module'; 
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    PrismaModule,
     AuthModule,
+    UsersModule,
     ProductsModule, 
-    OrdersModule //se agrega el modulo de orders
+    OrdersModule,
+    CartModule,
+    PaypalModule,
   ],
   controllers: [AppController],
   providers: [AppService],

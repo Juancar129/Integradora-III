@@ -4,16 +4,15 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
-}
 
 model User {
   id        Int       @id @default(autoincrement())
@@ -28,19 +27,34 @@ model User {
   orders    Order[]
 }
 
+// En tu archivo prisma/schema.prisma
+
 model Product {
   id          Int      @id @default(autoincrement())
   name        String
-  description String
+  // 🛑 CORRECCIÓN: El campo 'description' debería ser @db.Text para descripciones largas
+  description String   @db.Text 
   price       Float
   stock       Int
+  
+  // 🛑 RECOMENDACIÓN: Elimina 'imagen String?' si usas el array 'images'
+  // imagen String? 
+
+  categoria   String? 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  carItems CartItem []
-  orderItems  OrderItem[] //nuevos cambios
+  category    String   
+  carItems    CartItem[]
+  orderItems  OrderItem[] 
+  images      ProductImage[] 
 }
 
+model ProductImage {
+  id        Int      @id @default(autoincrement())
+  url       String   @db.VarChar(255) 
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade) // onDelele: Cascade borra imágenes si se borra el producto
+}
 model Cart {
   id        Int       @id @default(autoincrement())
   userId    Int       @unique
@@ -60,14 +74,29 @@ model CartItem {
 }
 
 //se actualiza el modelo de order para incluir orderItems
- model Order {
-  id         Int         @id @default(autoincrement())
-  userId     Int
-  user       User        @relation(fields: [userId], references: [id])
-  total      Float
-  createdAt  DateTime    @default(now())
-  orderItems OrderItem[]
+model Order {
+  id              Int           @id @default(autoincrement())
+  userId          Int
+  user            User          @relation(fields: [userId], references: [id])
+  paypalId        String?
+  total           Float
+  createdAt       DateTime      @default(now())
+  status          String        @default("PENDING") 
+  orderItems      OrderItem[]
+  // Información de envío
+  
+  // Nombre del destinatario
+  recipientName   String
+  // Calle y número
+  streetAddress   String
+  // Ciudad
+  city            String
+  // Código postal
+  postalCode      String
+  // País o región
+  country         String
 }
+
 
 //se implementa el modelo de orderItems
 model OrderItem {

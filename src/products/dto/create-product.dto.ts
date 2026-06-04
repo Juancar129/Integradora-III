@@ -1,15 +1,30 @@
-import { IsString, IsNumber } from 'class-validator';
+import { 
+    IsString, 
+    IsNumber, 
+    Min, 
+} from 'class-validator';
 
 export class CreateProductDto {
-  @IsString()
-  name: string;
 
-  @IsString()
-  description: string;
+    @IsString()
+    name: string;
 
-  @IsNumber()
-  price: number;
+    @IsNumber({ maxDecimalPlaces: 2 })
+    @Min(0.01)
+    price: number;
 
-  @IsNumber()
-  stock: number;
+    @IsString()
+    description: string;
+
+    @IsNumber()
+    @Min(0)
+    stock: number;
+
+    // 1. Campo para la lógica de negocio y filtro (ya existía)
+    @IsString()
+    category: string; 
+
+    
+    @IsString()
+    categoria: string; 
 }
