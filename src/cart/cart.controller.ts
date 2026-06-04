@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Param, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, ParseIntPipe, Req, UseGuards } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -12,19 +12,25 @@ export class CartController {
 
   @Get()
   getCart(@Req() req) {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     return this.cartService.getCart(userId);
   }
 
   @Post('add/:productId')
-  addProduct(@Req() req, @Param('productId') productId: number) {
-    const userId = req.user.id;
-    return this.cartService.addProduct(userId, +productId);
+  addProduct(@Req() req, @Param('productId', ParseIntPipe) productId: number) {
+    const userId = req.user.userId;
+    return this.cartService.addProduct(userId, productId);
   }
 
   @Delete('remove/:productId')
-  removeProduct(@Req() req, @Param('productId') productId: number) {
-    const userId = req.user.id;
-    return this.cartService.removeProduct(userId, +productId);
+  removeProduct(@Req() req, @Param('productId', ParseIntPipe) productId: number) {
+    const userId = req.user.userId;
+    return this.cartService.removeProduct(userId, productId);
+  }
+
+  @Delete('clear')
+  clearCart(@Req() req) {
+    const userId = req.user.userId;
+    return this.cartService.clearCart(userId);
   }
 }

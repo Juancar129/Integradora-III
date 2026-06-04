@@ -1,9 +1,8 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common'; 
+import { Injectable, ConflictException } from '@nestjs/common'; 
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { LoginUserDto } from './dto/login.dto'; // Mantenemos el DTO por si se usa en otro lugar
 import { Prisma } from '@prisma/client'; // Importamos solo lo necesario
 
 
@@ -18,9 +17,7 @@ export class AuthService {
    * Registra un nuevo usuario en la base de datos.
    */
   async register(dto: CreateUserDto) {
-    
-    // 1. Asignamos el rol por defecto.
-    const userRole = dto.role || 'user'; 
+    const userRole = 'user'; 
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 

@@ -1,34 +1,36 @@
-import { IsArray, IsNumber, IsString } from 'class-validator'; // <-- ¡Asegúrate de importar IsString!
+import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsArray, IsNumber, IsString, ValidateNested } from 'class-validator';
 import { CreateOrderItemDto } from './create-order-item.dto';
-import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateOrderDto {
   @IsNumber()
   @ApiProperty({ required: true, description: 'Costo total de la orden' })
-  total: number; 
+  total: number;
 
   @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateOrderItemDto)
   @ApiProperty({ type: [CreateOrderItemDto], description: 'Lista de items de la orden' })
   items: CreateOrderItemDto[];
 
-  // 💡 CAMPOS DE ENVÍO AÑADIDOS
   @IsString()
   @ApiProperty({ required: true, description: 'Nombre del destinatario' })
   recipientName: string;
 
   @IsString()
-  @ApiProperty({ required: true, description: 'Calle y número' })
+  @ApiProperty({ required: true, description: 'Calle y numero' })
   streetAddress: string;
-  
+
   @IsString()
   @ApiProperty({ required: true, description: 'Ciudad' })
   city: string;
-  
+
   @IsString()
-  @ApiProperty({ required: true, description: 'Código Postal' })
+  @ApiProperty({ required: true, description: 'Codigo Postal' })
   postalCode: string;
-  
+
   @IsString()
-  @ApiProperty({ required: true, description: 'País/Región' })
+  @ApiProperty({ required: true, description: 'Pais/Region' })
   country: string;
 }

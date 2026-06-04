@@ -44,7 +44,11 @@ export class PaypalController {
       this.logger.log(`Monto formateado para PayPal: ${amount}`);
 
       // 🔥 3. Crear orden en PayPal
-      const paypalResponse = await this.paypalService.createOrder(amount);
+      const paypalResponse = await this.paypalService.createOrder(
+        req.user.userId,
+        amount,
+        orderDto,
+      );
 
       if (!paypalResponse || !paypalResponse.links) {
         throw new HttpException(
